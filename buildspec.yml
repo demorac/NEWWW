@@ -1,0 +1,38 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo "Starting the install phase..."
+      - sudo apt-get update -y  # Update package list
+      - sudo apt-get install -y nginx  # Install Nginx to serve your HTML files
+      - echo "Install phase complete."
+
+  pre_build:
+    commands:
+      - echo "Starting the pre-build phase..."
+      - sudo service nginx start  # Start Nginx
+      - sudo service nginx status  # Verify Nginx is running
+      - echo "Pre-build phase complete."
+
+  build:
+    commands:
+      - echo "Starting the build phase..."
+      - if [ -f index.html ]; then echo "index.html found"; else echo "index.html NOT found"; exit 1; fi  # Check if index.html exists
+      - mkdir -p /var/www/html/  # Create the directory where Nginx serves files
+      - sudo cp index.html /var/www/html/  # Copy index.html to the directory served by Nginx
+      - echo "Build phase complete."
+
+  post_build:
+    commands:
+      - echo "Starting the post-build phase..."
+      - sudo service nginx stop  # Stop Nginx after the build, if necessary
+      - echo "Post-build phase complete."
+
+artifacts:
+  files:
+    - '**/*'  # If you need the file as an artifact (adjust as needed)
+
+cache:
+  paths: []
+
